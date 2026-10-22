@@ -10,8 +10,8 @@
     "license": "MIT",
     "repositories": [
         {
-            "type": "path",
-            "url": "../job-shared"
+            "type": "vcs",
+            "url": "https://github.com/mohamado197-Dev/job-shared.git"
         }
     ],
     "require": {
