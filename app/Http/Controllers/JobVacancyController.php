@@ -79,14 +79,27 @@ class JobVacancyController extends Controller
         }
         else{
             $resume_id = $request->input('resume_option');
-            $resume = Resume::findOrFail( $resume_id);
-            
-            $extractedInfo=[
-                'summary' => $resume->summary,
-                'skills' => $resume->skills,
-                'education' => $resume->education,
-                'experience' => $resume->experience,
-            ];
+            $resume = Resume::findOrFail($resume_id);
+
+            // If extraction previously failed (empty fields), re-extract from the stored Cloudinary URL
+            if (empty($resume->summary) && empty($resume->skills) && empty($resume->education) && empty($resume->experience)) {
+                $extractedInfo = $this->resumeAnalysisService->extractResumeInformation($resume->fileUrl);
+
+                // Update the record so future applications benefit from the extracted data
+                $resume->update([
+                    'summary'   => $extractedInfo['summary'],
+                    'skills'    => $extractedInfo['skills'],
+                    'education' => $extractedInfo['education'],
+                    'experience'=> $extractedInfo['experience'],
+                ]);
+            } else {
+                $extractedInfo = [
+                    'summary'   => $resume->summary,
+                    'skills'    => $resume->skills,
+                    'education' => $resume->education,
+                    'experience'=> $resume->experience,
+                ];
+            }
 
         }
 

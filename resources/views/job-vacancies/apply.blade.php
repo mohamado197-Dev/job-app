@@ -55,7 +55,7 @@
                         <div>
                             @forelse($resumes as $resume)
                             <div class="flex items-center gap-2">
-                                <input type="radio" name="resume_option" value="{{$resume->id}}" id="{{$resume->id}}" 
+                                <input type="radio" name="resume_option" value="{{$resume->id}}" id="existing_{{$resume->id}}" 
                                 @error('resume_option') class="border-red-500" @else class="border-gray-600" @enderror>
                                 <x-input-label for="existing_{{$resume->id}}" class="text-white cursor-pointer">
                                     {{$resume->fileName}}
@@ -74,7 +74,7 @@
                 </div>
 
                 <!-- upload new resume  -->
-                <div x-data="{fileName: '' ,hasError: '{{$errors ->has('resume_file') ? 'true':'false' }}'}">
+                <div x-data="{fileName: '' ,hasError: {{$errors->has('resume_file') ? 'true' : 'false' }}}">
                     <div class="flex items-center gap-2">
                         <input x-ref="newResumeRadio" type="radio" name="resume_option" value="new_resume" id="new_resume"               
                         @error('resume_option') class="border-red-500" @else class="border-gray-600" @enderror>
@@ -85,7 +85,7 @@
                             <label for="new_resume_file" class="block text-white cursor-pointer">
                                 <div
                                     class="border-2 border-dashed border-gray-600 rounded-lg p-4 hover:border-blue-500 transition"
-                                    :class="{'border-blue-500 : fileName, 'border-red-500': hasError }">
+                                    :class="{'border-blue-500': fileName, 'border-red-500': hasError }">
                                     <input @change="fileName = event.target.files[0].name; $refs.newResumeRadio.checked=true"
                                         type="file" id="new_resume_file" name="resume_file" class="hidden" accept=".pdf">
                                     <div class="text-center">
