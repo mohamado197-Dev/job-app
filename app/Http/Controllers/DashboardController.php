@@ -4,39 +4,37 @@ namespace App\Http\Controllers;
 
 use App\Models\JobVacancy;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
 
 class DashboardController extends Controller
 {
     public function index(Request $request)
     {
+        // ilike على PostgreSQL، و like على MariaDB (محلياً)
+        $like = DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
+
         $query = JobVacancy::query();
 
-            if($request->has('search') && $request->has('filter')){
-                $query->where(function($query)use($request){
-                    $query->where('title', 'like', "%{$request->search}%")
-                    ->orWhere('location', 'like', "%{$request->search}%")
-                    ->orWhereHas('company', function ($query) use ($request) {
-                        $query->where('name', 'like', "%{$request->search}%");
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search, $like) {
+                $q->where('title', $like, "%{$search}%")
+                    ->orWhere('location', $like, "%{$search}%")
+                    ->orWhereHas('company', function ($c) use ($search, $like) {
+                        $c->where('name', $like, "%{$search}%");
                     });
-                })->where('type', $request->filter);
+            });
+        }
 
-            }
+        if ($request->filled('filter')) {
+            $query->where('type', strtolower($request->filter));
+        }
 
-            if ($request->has('search') && $request->filter === null) {
-                $query->where('title', 'like', "%{$request->search}%")
-                ->orWhere('location', 'like', "%{$request->search}%")
-                ->orWhereHas('company', function ($query) use ($request) {
-                    $query->where('name', 'like', "%{$request->search}%");
-                });
-            }
+        $jobs = $query->latest()->paginate(10)->withQueryString();
 
-            if ($request->has('filter') && $request->search === null) {
-                $query->where('type', $request->filter);
-            }
-
-            $jobs = $query->latest()->paginate(10)->withQueryString();
-            
-        
         return view('dashboard', compact('jobs'));
+    
     }
 }
