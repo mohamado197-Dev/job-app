@@ -21,7 +21,9 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
 # Install PHP extensions
 RUN install-php-extensions \
     pdo_mysql \
-    mysqli
+    mysqli \
+    pdo_pgsql \
+    pgsql
 
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
@@ -59,9 +61,12 @@ RUN chown -R www-data:www-data /app/storage /app/bootstrap/cache
 # Copy Caddyfile
 COPY Caddyfile /etc/caddy/Caddyfile
 
+# Remove the capabilities of the FrankenPHP binary
+RUN setcap -r /usr/local/bin/frankenphp
+
 # Expose ports
 EXPOSE 80
 EXPOSE 443
 
 # Start FrankenPHP
-CMD ["frankenphp", "run", "--config", "/etc/caddy/Caddyfile"] 
+CMD ["frankenphp", "run", "--config", "/etc/caddy/Caddyfile"]
