@@ -4,7 +4,7 @@
             {{ __($jobVacancy->title) }} - Job Details
         </h2>
     </x-slot>
-      <h1> Views: {{ var_export($jobVacancy->view_count, true) }}</h1>
+
     <div class="py-12">
         <div class="bg-black shadow-lg rounded-lg p-6 max-w-7xl mx-auto">
             <a href="{{ route('dashboard') }}" class="text-white rounded-lg bg-blue-500/80 hover:bg-blue-500 p-2 mb-6 inline-block"> ← Back to Jobs</a>
